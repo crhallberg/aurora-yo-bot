@@ -2,7 +2,7 @@ var moment = require('moment');
 var request = require('request-promise');
 var schedule = require('node-schedule');
 
-var threshold = 7;
+var threshold = 4;
 var timezone = -5;
 console.log('threshold is ' + threshold + '.');
 console.log('timezone is ' + timezone + '.');
@@ -21,6 +21,7 @@ function makePrediction() {
         // find columns > 7
         var days = [];
         var times = [];
+        console.log(lines[13]);
         for (var i=14; i<=21; i++) {
           console.log(lines[i]);
           var cols = lines[i].replace(/\([^\)]+\)/, '     ').split(/[ ]{6,}/); //
@@ -35,15 +36,17 @@ function makePrediction() {
           // If we have candidates, check if it's dark
           var promises = [];
           for (var i=0; i<days.length; i++) {
-            var day = moment().add(days[i], 'days').format('YYYY-MM-DD');
+            var day = moment().add(days[i], 'days');
             if (day.isAfter()) {
-              var p = request('http://api.sunrise-sunset.org/json?lat=39.9&lng=-75.3&date='+day+'&formatted=0')
+              var p = request('http://api.sunrise-sunset.org/json?lat=39.9&lng=-75.3&date='+day.format('YYYY-MM-DD')+'&formatted=0')
                 .then(function(json) { return JSON.parse(json).results; });
               promises.push(p);
             }
           }
           Promise.all(promises).then(function (sunjsons) {
             var message = "";
+            var minDay = 10;
+            var minTime = 30;
             for (var i=0; i<sunjsons.length; i++) {
               var period = moment(times[i], 'HH').add(days[i], 'days');
               var night = moment(sunjsons[i].astronomical_twilight_end);
@@ -53,8 +56,10 @@ function makePrediction() {
               } else {
                 night.subtract(1, 'days');
               }
-              if (period.isBetween(night, morning)) {
-                message += period.format('dddd')+' the '+period.format('Do')+' from '+times[i]+' to '+((times[i]+3)%24)+'\n';
+              if (period.isBetween(night, morning) && days[i] < minDay && times[i] < minTime) {
+                minDay = days[i];
+                minTime = times[i];
+                message = period.format('dddd')+' the '+period.format('Do')+' from '+times[i]+' to '+((times[i]+3)%24)+'\n';
               }
             }
             if (message.length > 0) {
@@ -73,7 +78,6 @@ function makePrediction() {
     });
 }
 
-// TODO: Replace with timeout to run at 8am
 makePrediction();
+// Every day at 8am
 schedule.scheduleJob('0 8 * * *', makePrediction);
-console.log('see you tomorrow at 8!');
