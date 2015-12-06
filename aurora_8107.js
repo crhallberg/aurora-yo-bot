@@ -36,9 +36,11 @@ function makePrediction() {
           var promises = [];
           for (var i=0; i<days.length; i++) {
             var day = moment().add(days[i], 'days').format('YYYY-MM-DD');
-            var p = request('http://api.sunrise-sunset.org/json?lat=39.9&lng=-75.3&date='+day+'&formatted=0')
-              .then(function(json) { return JSON.parse(json).results; });
-            promises.push(p);
+            if (day.isAfter()) {
+              var p = request('http://api.sunrise-sunset.org/json?lat=39.9&lng=-75.3&date='+day+'&formatted=0')
+                .then(function(json) { return JSON.parse(json).results; });
+              promises.push(p);
+            }
           }
           Promise.all(promises).then(function (sunjsons) {
             var message = "";
