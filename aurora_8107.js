@@ -2,8 +2,20 @@ var moment = require('moment');
 var request = require('request-promise');
 var schedule = require('node-schedule');
 
-var threshold = 7;
-var timezone = -5;
+// City information
+var lat = 39.9;
+var lng = -75.3;
+var timezone = -5; // off of UTC
+
+// Check these maps for your minimum threshold
+// (imagine even numbers halfway between the lines)
+// (like an 8 for New Jersey or Ireland)
+// North America : http://www.softservenews.com/globeNW_big.gif
+// Europe        : http://www.softservenews.com/globeNE_big.gif
+var threshold = 8;
+
+var YOAPITOKEN = '***REMOVED***';
+
 console.log('threshold is ' + threshold + '.');
 console.log('timezone is ' + timezone + '.');
 
@@ -12,7 +24,7 @@ function yoMessage(msg) {
   request.post(
     'https://api.justyo.co/yoall/',
     { form: {
-      api_token: '***REMOVED***',
+      api_token: YOAPITOKEN,
       text: msg,
     } }
   );
@@ -28,7 +40,7 @@ function makePrediction() {
       var summary = lines[8].split(/is|\(/g);
       var max = parseInt(summary[1]);
       console.log('3-day forecast max is ' + max + '.');
-      if (max > threshold) {
+      if (max >= threshold) {
         // get columns
         // find columns > 7
         var days = [];
@@ -38,7 +50,7 @@ function makePrediction() {
           console.log(lines[i]);
           var cols = lines[i].replace(/\([^\)]+\)/, '     ').split(/[ ]{6,}/); //
           for (var j=1; j<cols.length; j++) {
-            if (parseInt(cols[j]) > threshold) {
+            if (parseInt(cols[j]) >= threshold) {
               days.push(j-1);
               times.push((((i-14)*3)+24+timezone)%24); // UTC is 5 hours ahead of Philly
             }
@@ -50,7 +62,7 @@ function makePrediction() {
           for (var i=0; i<days.length; i++) {
             var day = moment().add(days[i], 'days');
             if (day.isAfter()) {
-              var p = request('http://api.sunrise-sunset.org/json?lat=39.9&lng=-75.3&date='+day.format('YYYY-MM-DD')+'&formatted=0')
+              var p = request('http://api.sunrise-sunset.org/json?lat='+lat+'&lng='+lng+'&date='+day.format('YYYY-MM-DD')+'&formatted=0')
                 .then(function(json) { return JSON.parse(json).results; });
               promises.push(p);
             }
