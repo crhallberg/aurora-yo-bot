@@ -2,10 +2,22 @@ var moment = require('moment');
 var request = require('request-promise');
 var schedule = require('node-schedule');
 
-var threshold = 4;
+var threshold = 7;
 var timezone = -5;
 console.log('threshold is ' + threshold + '.');
 console.log('timezone is ' + timezone + '.');
+
+function yoMessage(msg) {
+  console.log(msg);
+  request.post(
+    'https://api.justyo.co/yoall/',
+    { form: {
+      api_token: '***REMOVED***',
+      text: msg,
+    } }
+  );
+
+}
 
 function makePrediction() {
   // Download forecast
@@ -59,21 +71,21 @@ function makePrediction() {
               if (period.isBetween(night, morning) && days[i] < minDay && times[i] < minTime) {
                 minDay = days[i];
                 minTime = times[i];
-                message = period.format('dddd')+' the '+period.format('Do')+' from '+times[i]+' to '+((times[i]+3)%24)+'\n';
+                message = period.format('dddd')+' the '+period.format('Do')+', '+moment(times[i], 'HH').format('ha')+' to '+((times[i]+3)%24);
               }
             }
             if (message.length > 0) {
               console.log('---');
-              console.log(message);
+              yoMessage(message);
             }
           });
         } else {
           console.log('---');
-          console.log('no auroras for philly :(');
+          yoMessage('no auroras for philly :(');
         }
       } else {
         console.log('---');
-        console.log('no auroras for philly :(');
+        yoMessage('no auroras for philly :(');
       }
     });
 }
