@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "moment": "^2.10.6",
+    "node-schedule": "^0.6.0",
     "request-promise": "^1.0.2"
   }
 }

@@ -1,7 +1,8 @@
-var request = require('request-promise');
 var moment = require('moment');
+var request = require('request-promise');
+var schedule = require('node-schedule');
 
-var threshold = 4;
+var threshold = 7;
 var timezone = -5;
 console.log('threshold is ' + threshold + '.');
 console.log('timezone is ' + timezone + '.');
@@ -58,16 +59,19 @@ function makePrediction() {
               console.log('---');
               console.log(message);
             }
-            process.exit();
           });
         } else {
           console.log('---');
           console.log('no auroras for philly :(');
-          process.exit();
         }
+      } else {
+        console.log('---');
+        console.log('no auroras for philly :(');
       }
     });
 }
 
 // TODO: Replace with timeout to run at 8am
 makePrediction();
+schedule.scheduleJob('0 8 * * *', makePrediction);
+console.log('see you tomorrow at 8!');
