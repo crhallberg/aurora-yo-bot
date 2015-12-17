@@ -3,6 +3,7 @@ var request = require('request-promise');
 var schedule = require('node-schedule');
 
 // City information
+// This is for Philadelphia
 var lat = 39.9;
 var lng = -75.3;
 var timezone = -5; // off of UTC
@@ -14,7 +15,7 @@ var timezone = -5; // off of UTC
 // Europe        : http://www.softservenews.com/globeNE_big.gif
 var threshold = 8;
 
-var YOAPITOKEN = '***REMOVED***';
+var YOAPITOKEN = 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX';
 
 console.log('threshold is ' + threshold + '.');
 console.log('timezone is ' + timezone + '.');
