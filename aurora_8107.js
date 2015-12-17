@@ -93,11 +93,11 @@ function makePrediction() {
           });
         } else {
           console.log('---');
-          yoMessage('no auroras for philly :(');
+          console.log('no auroras for philly :(');
         }
       } else {
         console.log('---');
-        yoMessage('no auroras for philly :(');
+        console.log('no auroras for philly :(');
       }
     });
 }
