@@ -1,6 +1,8 @@
 # aurora-yo-bot
 node.js based yo bot that alerts you when aurora borealous may be visible in your area
 
+Subscribe to the Philly bot: [PHILLYAURORA](http://justyo.co/PHILLYAURORA).
+
 ## Setup
 
 You'll need the latitude and longitude for your target area. Code is setup for Philadelphia.
